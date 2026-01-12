@@ -30,5 +30,3 @@ struct Headers {
         return values
     }
 }
-
-
