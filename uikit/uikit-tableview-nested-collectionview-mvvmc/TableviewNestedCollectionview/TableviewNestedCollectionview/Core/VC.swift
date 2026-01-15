@@ -18,7 +18,7 @@ open class VC: UIViewController {
     
     @available(*, unavailable)
     required public init?(coder: NSCoder) { nil }
-    
+
     deinit {
         print("☠️ deinit object: \(self)")
     }

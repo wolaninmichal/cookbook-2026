@@ -40,12 +40,13 @@ final class BlisterCell: UICollectionViewCell {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: internalLayout)
         cv.backgroundColor = .clear
         cv.isScrollEnabled = false
+        cv.isUserInteractionEnabled = false
         cv.dataSource = self
         cv.register(BlisterSquareCell.self, forCellWithReuseIdentifier: BlisterSquareCell.reuseID)
         return cv
     }()
 
-    private var vm: BlisterPageVM?
+    private var page: BlisterVM.Page?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -57,7 +58,7 @@ final class BlisterCell: UICollectionViewCell {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        vm = nil
+        page = nil
     }
 
     override func layoutSubviews() {
@@ -67,21 +68,15 @@ final class BlisterCell: UICollectionViewCell {
 
     private func configureUI() {
         contentView.backgroundColor = .clear
-
         contentView.addSubview(cardView)
         cardView.addSubview(internalCollection)
 
-        cardView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-
-        internalCollection.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        cardView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        internalCollection.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
 
-    func configure(with vm: BlisterPageVM) {
-        self.vm = vm
+    func configure(with page: BlisterVM.Page) {
+        self.page = page
         internalCollection.reloadData()
         internalCollection.layoutIfNeeded()
         updateSquareItemSize()
@@ -103,13 +98,10 @@ final class BlisterCell: UICollectionViewCell {
 extension BlisterCell: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        vm?.itemsCount ?? 0
+        page?.itemsCount ?? 0
     }
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: BlisterSquareCell.reuseID,
             for: indexPath

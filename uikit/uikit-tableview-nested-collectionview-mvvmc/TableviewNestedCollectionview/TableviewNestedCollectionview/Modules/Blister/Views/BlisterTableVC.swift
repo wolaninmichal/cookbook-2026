@@ -9,11 +9,10 @@ import UIKit
 import SnapKit
 
 final class BlisterTableVC: VC {
-
-    private let vm: BlisterTableVM
+    private let vm: BlisterVM
     private let tableView = UITableView(frame: .zero, style: .plain)
 
-    init(vm: BlisterTableVM) {
+    init(vm: BlisterVM) {
         self.vm = vm
         super.init()
         title = "uikit-tableview-nested-collectionview"
@@ -23,13 +22,13 @@ final class BlisterTableVC: VC {
         super.viewDidLoad()
         configureTableView()
         bindVM()
-        vm.viewDidLoad()
+        vm.send(.viewDidLoad)
     }
 
-    override func setupIphoneUI() { setupCommonUI() }
-    override func setupIpadUI() { setupCommonUI() }
+    override func setupIphoneUI() { setup() }
+    override func setupIpadUI() { setup() }
 
-    private func setupCommonUI() {
+    private func setup() {
         view.backgroundColor = .systemBackground
         view.addSubview(tableView)
         tableView.snp.makeConstraints { $0.edges.equalTo(view.safeAreaLayoutGuide) }
@@ -40,7 +39,7 @@ final class BlisterTableVC: VC {
         tableView.separatorStyle = .none
 
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 260 
+        tableView.estimatedRowHeight = 200
 
         tableView.dataSource = self
         tableView.delegate = self
@@ -62,28 +61,23 @@ extension BlisterTableVC: UITableViewDataSource {
         vm.numberOfRows()
     }
 
-    func tableView(
-        _ tableView: UITableView,
-        cellForRowAt indexPath: IndexPath
-    ) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         switch vm.row(at: indexPath.row) {
+
         case .blister:
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: BlisterRowCell.reuseID,
                 for: indexPath
             ) as? BlisterRowCell else { return UITableViewCell() }
 
-            cell.configure(
-                with: vm.blisterVM.pages,
-                contentOffset: vm.blisterVM.lastContentOffset
-            )
-
-            cell.onContentOffsetChanged = { [weak self] offset in
-                self?.vm.blisterVM.lastContentOffset = offset
+            cell.configure(with: vm.pages)
+            cell.onPageTapped = { [weak self] pageID in
+                self?.vm.send(.pageTapped(id: pageID))
             }
 
             return cell
+
 
         case .bottom:
             guard let cell = tableView.dequeueReusableCell(
@@ -91,10 +85,16 @@ extension BlisterTableVC: UITableViewDataSource {
                 for: indexPath
             ) as? BlisterBottomRowCell else { return UITableViewCell() }
 
-            cell.configure(with: vm.bottomVM)
+            cell.configure(title: vm.bottom.title, subtitle: vm.bottom.subtitle)
             return cell
         }
     }
 }
 
-extension BlisterTableVC: UITableViewDelegate { }
+extension BlisterTableVC: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if vm.row(at: indexPath.row) == .bottom {
+            vm.send(.bottomTapped)
+        }
+    }
+}

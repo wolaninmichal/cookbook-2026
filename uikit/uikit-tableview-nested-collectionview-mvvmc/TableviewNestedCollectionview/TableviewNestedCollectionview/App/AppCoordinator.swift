@@ -23,7 +23,6 @@ final class AppCoordinator: Coordinator {
         let blisterCoord: BlisterCoordinator = .init(root: root)
         blisterCoord.parent = self
         store(child: blisterCoord)
-        
         blisterCoord.start()
         
         window.rootViewController = root

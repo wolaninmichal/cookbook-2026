@@ -5,8 +5,8 @@
 //  Created by Michał Wolanin on 12/01/2026.
 //
 
-import UIKit
 import SnapKit
+import UIKit
 
 final class BlisterBottomRowCell: UITableViewCell {
 
@@ -30,7 +30,7 @@ final class BlisterBottomRowCell: UITableViewCell {
     }
 
     private func configureUI() {
-        selectionStyle = .none
+        selectionStyle = .default
         contentView.backgroundColor = .systemBackground
 
         titleLabel.font = .preferredFont(forTextStyle: .headline)
@@ -56,8 +56,8 @@ final class BlisterBottomRowCell: UITableViewCell {
         }
     }
 
-    func configure(with vm: BlisterBottomVM) {
-        titleLabel.text = vm.title
-        subtitleLabel.text = vm.subtitle
+    func configure(title: String, subtitle: String) {
+        titleLabel.text = title
+        subtitleLabel.text = subtitle
     }
 }

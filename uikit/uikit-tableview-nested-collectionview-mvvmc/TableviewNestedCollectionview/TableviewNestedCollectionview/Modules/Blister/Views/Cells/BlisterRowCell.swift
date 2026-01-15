@@ -37,8 +37,8 @@ final class BlisterRowCell: UITableViewCell {
         return cv
     }()
 
-    private var pages: [BlisterPageVM] = []
-    var onContentOffsetChanged: ((CGPoint) -> Void)?
+    private var pages: [BlisterVM.Page] = []
+    var onPageTapped: ((UUID) -> Void)?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -51,7 +51,7 @@ final class BlisterRowCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         pages = []
-        onContentOffsetChanged = nil
+        onPageTapped = nil
         headerLabel.text = nil
         externalCollection.setContentOffset(.zero, animated: false)
     }
@@ -77,16 +77,16 @@ final class BlisterRowCell: UITableViewCell {
             $0.top.equalTo(headerLabel.snp.bottom).offset(12)
             $0.leading.equalToSuperview()
             $0.trailing.equalToSuperview()
-            $0.height.equalTo(170)
+            $0.height.equalTo(135)
             $0.bottom.equalToSuperview().inset(16).priority(.low)
         }
     }
 
-    func configure(with pages: [BlisterPageVM], contentOffset: CGPoint) {
+    func configure(with pages: [BlisterVM.Page]) {
         self.pages = pages
         externalCollection.reloadData()
         externalCollection.layoutIfNeeded()
-        externalCollection.setContentOffset(contentOffset, animated: false)
+        externalCollection.setContentOffset(.zero, animated: false)
     }
 }
 
@@ -96,10 +96,7 @@ extension BlisterRowCell: UICollectionViewDataSource {
         pages.count
     }
 
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: BlisterCell.reuseID,
             for: indexPath
@@ -117,16 +114,15 @@ extension BlisterRowCell: UICollectionViewDelegateFlowLayout {
         layout collectionViewLayout: UICollectionViewLayout,
         sizeForItemAt indexPath: IndexPath
     ) -> CGSize {
-        let width = collectionView.bounds.width
+        let insets = externalLayout.sectionInset
+        let width = max(0, collectionView.bounds.width - insets.left - insets.right)
         let height = collectionView.bounds.height
         return CGSize(width: width, height: height)
     }
 }
 
-extension BlisterRowCell: UIScrollViewDelegate {
-
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard scrollView === externalCollection else { return }
-        onContentOffsetChanged?(scrollView.contentOffset)
+extension BlisterRowCell: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        onPageTapped?(pages[indexPath.item].id)
     }
 }
