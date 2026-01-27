@@ -2,7 +2,7 @@
 //  Todo.swift
 //  TodoCrudCrud
 //
-//  Created by Michał Wolanin on 20/12/2025.
+//  Created by Michał Wolanin on 27/01/2026.
 //
 
 import Foundation
@@ -12,7 +12,7 @@ struct Todo: Codable, Hashable, Identifiable {
     var title: String
     var isDone: Bool
     var createdAt: Date
-
+    
     enum CodingKeys: String, CodingKey {
         case id = "_id"
         case title

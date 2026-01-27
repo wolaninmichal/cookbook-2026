@@ -20,4 +20,3 @@ extension Endpoint {
     var queryItems: [URLQueryItem] { [] }
     var headers: [String: String] { [:] }
 }
-

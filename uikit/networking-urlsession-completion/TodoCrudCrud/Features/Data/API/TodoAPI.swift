@@ -36,6 +36,6 @@ enum TodoAPI: Endpoint {
         case .delete: return .delete
         }
     }
-
+    
     var queryItems: [URLQueryItem] { [] }
 }
